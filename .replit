@@ -1,0 +1,2 @@
+language = "cpp"
+run = "g++ Work/Quang/HelloWorld.c ; ./a.out"
