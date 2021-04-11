@@ -8,9 +8,9 @@ int main(){
 	int numberOfUsers, numberOfItems; 
  	float matrix[50][50];
  	float avgMatrix[50][50];
-  	float simMatrix[50][50];
-  	inputMatrix("input.inp", matrix, numberOfUsers, numberOfItems);
-  	return 0;
+  float simMatrix[50][50];
+  inputMatrix("input.inp", matrix, numberOfUsers, numberOfItems);
+  return 0;
 }
 void inputMatrix(char fileName[],float matrix[50][50], int &numberOfUsers, int &numberOfItems){
 	FILE *fptr;
