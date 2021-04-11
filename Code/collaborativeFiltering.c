@@ -1,7 +1,7 @@
 #include<stdio.h>
 void inputMatrix(char fileName[], float matrix[50][50], int &numberOfUsers, int &numberOfItems);
 void xuat_matran(float matrix[50][50],int numberOfUsers,int numberOfItems);
-float gia_tri_trung_binh(float matrix[50][50],int user,int numberOfItems);
+float getAvgRating(float matrix[50][50],int user,int numberOfItems);
 float similarity(float matrix[50][50],float avgMatrix[50][50],int user1,int user2,int numberOfItems);
 void outputMatrix(char fileName[],float matrixOut[50][50]);
 int main(){
@@ -10,6 +10,7 @@ int main(){
  	float avgMatrix[50][50];
   float simMatrix[50][50];
   inputMatrix("input.inp", matrix, numberOfUsers, numberOfItems);
+  printf("%f",getAvgRating(matrix, 3, numberOfItems));
   return 0;
 }
 void inputMatrix(char fileName[],float matrix[50][50], int &numberOfUsers, int &numberOfItems){
@@ -22,3 +23,15 @@ void inputMatrix(char fileName[],float matrix[50][50], int &numberOfUsers, int &
   	}
   	fclose(fptr);
 }
+float getAvgRating(float matrix[50][50],int user,int numberOfItems){
+	int count = 0;
+	float sum = 0;
+	for (int j = 1;j <= numberOfItems;j++){
+		if (matrix[user][j] != 0) {
+			count++;
+			sum += matrix[user][j];
+		}
+	}
+	return (sum/count);
+}	
+
