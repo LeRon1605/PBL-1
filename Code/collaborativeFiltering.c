@@ -2,8 +2,8 @@
 #include<math.h>
 void xuat_matran(float matrix[50][50],int numberOfUsers,int numberOfItems); // Hàm xuất ma trận
 void inputMatrix(char fileName[], float matrix[50][50], int &numberOfUsers, int &numberOfItems); // Hàm đọc giá trị ma trận từ file
-float getAvgRating(float matrix[50][50],int user,int numberOfItems); // Hàm lấy giá trị rating trung bình của người dùng
-float similarity(float matrix[50][50],float avgMatrix[50][50],int user1,int user2,int numberOfItems); // Hàm lấy giá trị sim giữa hai người dùng 
+float getAvgRatingOfUser(float matrix[50][50],int user,int numberOfItems); // Hàm lấy giá trị rating trung bình của người dùng
+float getSimilarity(float matrix[50][50],float avgMatrix[50][50],int user1,int user2,int numberOfItems); // Hàm lấy giá trị sim giữa hai người dùng 
 void outputMatrix(char fileName[],float matrixOut[50][50]); // Hàm ghi ma trận kết quả ra file
 
 
@@ -17,7 +17,7 @@ int main(){
   printf("\n\n\n");
   //
   for (int i = 1;i <= numberOfUsers;i++){
-    float avgRatingOfUser = getAvgRating(matrix, i, numberOfItems);
+    float avgRatingOfUser = getAvgRatingOfUser(matrix, i, numberOfItems);
     for (int j = 1;j <= numberOfItems;j++){
       if (matrix[i][j] != 0) avgMatrix[i][j] = matrix[i][j] - avgRatingOfUser;
         else avgMatrix[i][j] = 0;
@@ -48,7 +48,7 @@ void inputMatrix(char fileName[],float matrix[50][50], int &numberOfUsers, int &
     fclose(fptr);
 }
 // Hàm lấy giá trị sim giữa hai người dùng 
-float getAvgRating(float matrix[50][50],int user,int numberOfItems){
+float getAvgRatingOfUser(float matrix[50][50],int user,int numberOfItems){
   int count = 0;
   float sum = 0;
   for (int j = 1;j <= numberOfItems;j++){
@@ -60,12 +60,12 @@ float getAvgRating(float matrix[50][50],int user,int numberOfItems){
   return (sum/count);
 } 
 // Hàm lấy giá trị sim giữa hai người dùng 
-float similarity(float matrix[50][50],float avgMatrix[50][50],int user1,int user2,int numberOfItems){
+float getSimilarity(float matrix[50][50],float avgMatrix[50][50],int user1,int user2,int numberOfItems){
   float tuSo = 0;
   float sumOfUser1 = 0;
   float sumOfUser2 = 0;
   for (int i = 1;i <= numberOfItems;i++){
-    if (avgMatrix[user1][i] * avgMatrix[user2][i] != 0){
+    if (matrix[user1][i] * matrix[user2][i] != 0){
       tuSo += avgMatrix[user1][i]*avgMatrix[user2][i];
       sumOfUser1 += pow(avgMatrix[user1][i], 2);
       sumOfUser2 += pow(avgMatrix[user2][i], 2);
