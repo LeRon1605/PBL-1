@@ -13,6 +13,7 @@ int main(){
   float avgMatrix[50][50];
   float simMatrix[50][50];
   inputMatrix("input.inp", matrix, numberOfUsers, numberOfItems);
+  printf("Input matrix\n");
   xuat_matran(matrix, numberOfUsers, numberOfItems);
   printf("\n\n\n");
   //
@@ -24,8 +25,18 @@ int main(){
     }
   }
   // Trừ giá trị rating cho rating trung bình lưu vào ma trận avgMatrix
+  printf("Average Matrix\n");
   xuat_matran(avgMatrix, numberOfUsers, numberOfItems);
+  // Gán giá trị sim vào ma trận
+  for (int i = 1;i <= numberOfUsers;i++){
+    for (int j = 1;j <= numberOfUsers;j++){
+      simMatrix[i][j] = getSimilarity(matrix, avgMatrix, i, j, numberOfItems);
+    }
+  } 
   printf("\n\n\n");
+  printf("Sim matrix\n");
+  xuat_matran(simMatrix, numberOfUsers, numberOfUsers);
+ 
   return 0;
 }
 
