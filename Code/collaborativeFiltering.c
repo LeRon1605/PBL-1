@@ -14,6 +14,7 @@ int main(){
   inputMatrix("input.inp", matrix, numberOfUsers, numberOfItems);
   printf("Input matrix\n");
   xuat_matran(matrix, numberOfUsers, numberOfItems);
+  outputMatrix("output.out", matrix, numberOfUsers, numberOfItems);
   printf("\n\n\n");
   //
   for (int i = 1;i <= numberOfUsers;i++){
@@ -35,14 +36,14 @@ int main(){
   printf("\n\n\n");
   printf("Sim matrix\n");
   xuat_matran(simMatrix, numberOfUsers, numberOfUsers);
- 
+
   return 0;
 }
 
 // Hàm xuất ma trận
 void xuat_matran(float matrix[50][50],int numberOfUsers,int numberOfItems){
   for(int i = 1; i <= numberOfUsers; i++) {
-    for ( int j = 1; j <= numberOfItems; j++) printf("%f\t",matrix[i][j]);
+    for (int j = 1; j <= numberOfItems; j++) printf("%f\t",matrix[i][j]);
     printf("\n");
   } 
 } 
@@ -70,6 +71,20 @@ void inputMatrix(char fileName[], float matrix[50][50], int &numberOfUsers, int 
   numberOfUsers = rows;
   numberOfItems = columns;
   fclose(fptr);
+}
+// Ghi kết quả ma trận ra file
+void outputMatrix(char fileName[], float matrix[50][50], int rows, int columns){
+	FILE *fptr = fopen(fileName,"w");
+	if (fptr == NULL){
+		printf("Can't open file.");
+		//exit(1);
+	}else{
+		for (int i = 1;i <= rows;i++){
+			for (int j = 1;j <= columns;j++) fprintf(fptr, "%2.2f\t", matrix[i][j]);
+			fprintf(fptr, "\n" );
+		}
+	}
+	fclose(fptr);
 }
 // Hàm lấy giá trị sim giữa hai người dùng 
 float getAvgRatingOfUser(float matrix[50][50],int user,int numberOfItems){
