@@ -2,10 +2,9 @@
 #include<math.h>
 void xuat_matran(float matrix[50][50],int numberOfUsers,int numberOfItems); // Hàm xuất ma trận
 void inputMatrix(char fileName[], float matrix[50][50], int &numberOfUsers, int &numberOfItems); // Hàm đọc giá trị ma trận từ file
+void outputMatrix(char fileName[], float matrixOut[50][50], int columns,int rows); // Hàm xuất ma trận ra file
 float getAvgRatingOfUser(float matrix[50][50],int user,int numberOfItems); // Hàm lấy giá trị rating trung bình của người dùng
 float getSimilarity(float matrix[50][50],float avgMatrix[50][50],int user1,int user2,int numberOfItems); // Hàm lấy giá trị sim giữa hai người dùng 
-void outputMatrix(char fileName[],float matrixOut[50][50]); // Hàm ghi ma trận kết quả ra file
-
 
 int main(){
   int numberOfUsers, numberOfItems; 
@@ -48,15 +47,29 @@ void xuat_matran(float matrix[50][50],int numberOfUsers,int numberOfItems){
   } 
 } 
  // Hàm đọc giá trị ma trận từ file
-void inputMatrix(char fileName[],float matrix[50][50], int &numberOfUsers, int &numberOfItems){
+void inputMatrix(char fileName[], float matrix[50][50], int &numberOfUsers, int &numberOfItems){
   FILE *fptr;
-    fptr = fopen(fileName,"r+");
-    fscanf(fptr,"%d",&numberOfUsers);
-    fscanf(fptr,"%d",&numberOfItems);
-    for (int i = 1;i <= numberOfUsers;i++){
-      for (int j = 1;j <= numberOfItems;j++) fscanf(fptr,"%f",&matrix[i][j]);
+  fptr = fopen(fileName,"r");
+  int rows = 1, columns = 0;
+  char c;
+  if (fptr == NULL){
+    printf("Can't open file.");
+    exit(1);
+  }else{
+    while((c = fgetc(fptr)) != EOF){
+      if (c == '\n'){
+        rows += 1;
+        columns = 1;
+      }else{
+        fseek(fptr, -1, SEEK_CUR);
+        columns += 1;
+      }
+      fscanf(fptr,"%f",&matrix[rows][columns]);
     }
-    fclose(fptr);
+  }
+  numberOfUsers = rows;
+  numberOfItems = columns;
+  fclose(fptr);
 }
 // Hàm lấy giá trị sim giữa hai người dùng 
 float getAvgRatingOfUser(float matrix[50][50],int user,int numberOfItems){
