@@ -13,10 +13,11 @@ int main(){
   float matrix[50][50];
   float avgMatrix[50][50];
   float simMatrix[50][50];
+  float simMatrix2[50][50];
   inputMatrix("input.inp", matrix, numberOfUsers, numberOfItems);
   int k = numberOfUsers/2;
   int arr[k + 1];
-  printf("Input matrix\n");
+  //printf("Input matrix\n");
   xuat_matran(matrix, numberOfUsers, numberOfItems);
   outputMatrix("output.out", matrix, numberOfUsers, numberOfItems);
   printf("\n\n\n");
@@ -29,42 +30,40 @@ int main(){
     }
   }
   // Trừ giá trị rating cho rating trung bình lưu vào ma trận avgMatrix
-  printf("Average Matrix\n");
-  xuat_matran(avgMatrix, numberOfUsers, numberOfItems);
+
   // Gán giá trị sim vào ma trận
   for (int i = 1;i <= numberOfUsers;i++){
+
     for (int j = 1;j <= numberOfUsers;j++){
       simMatrix[i][j] = getSimilarity(matrix, avgMatrix, i, j, numberOfItems);
     }
   }  
-  printf("\n\n\n");
-  printf("Sim matrix\n");
   xuat_matran(simMatrix, numberOfUsers, numberOfUsers); 
-  /*
   for (int i = 1;i <= numberOfUsers;i++){
+    float avgRating = getAvgRatingOfUser(matrix,i,numberOfItems);
     getNeighbor(simMatrix, numberOfUsers, i, k, arr);
-    for (int j = 1;j <= numberOfItems;j++){
-      if (matrix[i][j] == 0) matrix[i][j] = getRating(matrix, simMatrix, avgMatrix, numberOfUsers, numberOfItems, k, arr, i, j);
+    for (int j = 1;j <= numberOfItems;j++){ 
+      if (matrix[i][j] == 0) {
+        matrix[i][j] = avgRating + getRating(matrix, simMatrix, avgMatrix, numberOfUsers, numberOfItems, k, arr, i, j);
+      }
     }
   }
+  printf("\n");
+  xuat_matran(matrix, numberOfUsers, numberOfItems);
   /*
-  printf("%f",getRating(matrix, simMatrix,avgMatrix, numberOfUsers, numberOfItems, k, arr, 3, 5));
-   for (int i = 1;i <= k;i++) printf(" %d ",arr[i]);
-  printf("\n\n\n");
+  printf("******************************************************************************\n");
+  printf("*                                                                            *\n");
+  printf("*                      DO AN: LAP TRINH TINH TOAN                            *\n");
+  printf("*               DE TAI: DU DOAN DIEM DANH GIA NGUOI DUNG                     *\n");
+  printf("*                                                                            *\n");
+  printf("******************************************************************************\n");
+  printf("\n\n");
+  printf("********************************  MENU   *************************************\n");
+  printf("*                                                                            *\n");
+  printf("*   1. Doc du lieu tu file                                                   *\n");
   */
-  for (int i = 1;i <= numberOfUsers;i++){
-    printf("%d: ",i);
-    getNeighbor(simMatrix, numberOfUsers, i, k, arr);
-    for (int j = 1;j <= numberOfUsers;j++){
-      printf("%d ",arr[j]);
-    }
-    printf("\n");
-  }
-  printf("\n\n\n");
-  xuat_matran(matrix, numberOfUsers, numberOfItems); 
   return 0;
 }
-
 // Hàm xuất ma trận
 void xuat_matran(float matrix[50][50],int numberOfUsers,int numberOfItems){
   for(int i = 1; i <= numberOfUsers; i++) {
@@ -143,27 +142,32 @@ void swap(float *a, float *b){
   *b = temp;
 }
 void getNeighbor(float simMatrix[50][50],int numberOfUsers,int user, int k, int arr[]) {
-  for (int i = 1;i <= numberOfUsers;i++) arr[i] = i;
-  int n =numberOfUsers;
+  int n = numberOfUsers;
+  int q = 1;
+  float simMatrix2[numberOfUsers + 1][numberOfUsers + 1];
+  for (int j = 1;j <= numberOfUsers;j++){
+      simMatrix2[user][j] = simMatrix[user][j];
+  }
   for (int i = 1;i <= k;i++){
-    for (int j = 1;j < n;j++){
-      if (simMatrix[user][j] > simMatrix[user][j + 1] && simMatrix[user][j] != 1 && simMatrix[user][j + 1] != 1){
-        swap(&simMatrix[user][j],&simMatrix[user][j + 1]);
-        int temp = arr[j];
-        arr[j] = arr[j + 1];
-        arr[j + 1] = temp;
-      }
+    float maxRating = (user == 1) ? simMatrix2[user][2] : simMatrix2[user][1];
+    int index = (user == 1) ? 2 : 1;
+    for (int j = 1;j <= n;j++){
+        if (simMatrix2[user][j] > maxRating && simMatrix2[user][j] != 1){
+          maxRating = simMatrix2[user][j];
+          index = j;
+        }
     }
+    arr[q++] = index;
+    swap(&simMatrix2[user][index], &simMatrix2[user][n]);
     n--;
   }
 }
 float getRating(float matrix[50][50], float simMatrix[50][50],float avgMatrix[50][50], int numberOfUsers, int numberOfItems, int k, int arr[], int user, int item){
-  float avgRating = getAvgRatingOfUser(matrix,user,numberOfItems);
   float tuSo = 0;
   float mauSo = 0;
   for (int i = 1;i <= k;i++){
-     tuSo += getSimilarity(matrix,avgMatrix,user,arr[i],numberOfItems)*avgMatrix[arr[i]][item];
-     mauSo += abs(getSimilarity(matrix,avgMatrix,user,arr[i],numberOfItems));
+     tuSo += simMatrix[arr[i]][user]*avgMatrix[arr[i]][item];
+     mauSo += abs(simMatrix[arr[i]][user]);
   }
-  return avgRating + (tuSo/mauSo);
+  return (tuSo/mauSo);
 }
