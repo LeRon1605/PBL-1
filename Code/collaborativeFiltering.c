@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<math.h>
 void xuat_matran(float matrix[50][50],int numberOfUsers,int numberOfItems); // Hàm xuất ma trận
+void inputMatrixFromKeyBoard(float matrix[50][50], int &numberOfUsers, int &numberOfItems);
 void inputMatrix(char fileName[], float matrix[50][50], int &numberOfUsers, int &numberOfItems); // Hàm đọc giá trị ma trận từ file
 void outputMatrix(char fileName[], float matrixOut[50][50], int columns,int rows); // Hàm xuất ma trận ra file
 float getAvgRatingOfUser(float matrix[50][50],int user,int numberOfItems); // Hàm lấy giá trị rating trung bình của người dùng
@@ -8,70 +9,253 @@ float getSimilarity(float matrix[50][50],float avgMatrix[50][50],int user1,int u
 void getNeighbor(float simMatrix[50][50],int numberOfUsers,int user, int k, int arr[]); // Hàm lấy neighbor
 float getRating(float matrix[50][50], float simMatrix[50][50],float avgMatrix[50][50], int numberOfUsers, int numberOfItems, int k, int arr[], int user, int item);
 void swap(float *a, float *b);
+void saochep(float matrix1[50][50],float matrix2[50][50],int rows,int columns);
 int main(){
   int numberOfUsers, numberOfItems; 
+  int k;
+  int arr[50];
   float matrix[50][50];
+  float matrix2[50][50];
   float avgMatrix[50][50];
   float simMatrix[50][50];
   float simMatrix2[50][50];
-  inputMatrix("input.inp", matrix, numberOfUsers, numberOfItems);
-  int k = numberOfUsers/2;
-  int arr[k + 1];
-  //printf("Input matrix\n");
-  xuat_matran(matrix, numberOfUsers, numberOfItems);
-  outputMatrix("output.out", matrix, numberOfUsers, numberOfItems);
-  printf("\n\n\n");
-  //
-  for (int i = 1;i <= numberOfUsers;i++){
-    float avgRatingOfUser = getAvgRatingOfUser(matrix, i, numberOfItems);
-    for (int j = 1;j <= numberOfItems;j++){
-      if (matrix[i][j] != 0) avgMatrix[i][j] = matrix[i][j] - avgRatingOfUser;
-        else avgMatrix[i][j] = 0;
+  //inputMatrix("input.inp", matrix, numberOfUsers, numberOfItems);
+  int optionMenu;
+  int isInput = 0;
+  do{
+    system("cls");
+    printf("******************************************************************************\n");
+    printf("*                                                                            *\n");
+    printf("*                      DO AN: LAP TRINH TINH TOAN                            *\n");
+    printf("*               DE TAI: DU DOAN DIEM DANH GIA NGUOI DUNG                     *\n");
+    printf("*                                                                            *\n");
+    printf("******************************************************************************\n");
+    printf("\n\n");
+    printf("********************************    MENU   ***********************************\n");
+    printf("*                                                                            *\n");
+    printf("*   1. Input                                                                 *\n");
+    printf("*   2. Output ket qua                                                        *\n");
+    printf("*   3. Exit                                                                  *\n");
+    printf("*                                                                            *\n");
+    printf("******************************************************************************\n\n\n\n");
+    printf("Nhap lua chon: ");
+    scanf("%d",&optionMenu);
+    switch(optionMenu){
+      case 1:
+        int inputOption;
+        do {
+          system("cls");
+          printf("******************************************************************************\n");
+          printf("*                                                                            *\n");
+          printf("*                      DO AN: LAP TRINH TINH TOAN                            *\n");
+          printf("*               DE TAI: DU DOAN DIEM DANH GIA NGUOI DUNG                     *\n");
+          printf("*                                                                            *\n");
+          printf("******************************************************************************\n");
+          printf("\n\n");
+          printf("****************************   INPUT MENU  ***********************************\n");
+          printf("*                                                                            *\n");
+          printf("*   1. Nhap input tu ban phim.                                               *\n");
+          printf("*   2. Doc input tu file.                                                    *\n");
+          printf("*   3. Exit                                                                  *\n");
+          printf("*                                                                            *\n");
+          printf("******************************************************************************\n\n\n\n");
+          printf("Nhap lua chon: ");
+          scanf("%d",&inputOption);
+          switch(inputOption){
+            case 1:
+              system("cls");
+              isInput = 1;
+              printf("******************************************************************************\n");
+              printf("*                                                                            *\n");
+              printf("*                        NHAP INPUT TU BAN PHIM                              *\n");
+              printf("*                                                                            *\n");
+              printf("******************************************************************************\n\n\n");
+              inputMatrixFromKeyBoard(matrix,numberOfUsers,numberOfItems);
+              saochep(matrix,matrix2,numberOfUsers,numberOfItems);
+              k = numberOfUsers/2;
+              for (int i = 1;i <= numberOfUsers;i++){
+                  float avgRatingOfUser = getAvgRatingOfUser(matrix, i, numberOfItems);
+                  for (int j = 1;j <= numberOfItems;j++){
+                    if (matrix[i][j] != 0) avgMatrix[i][j] = matrix[i][j] - avgRatingOfUser;
+                      else avgMatrix[i][j] = 0;
+                  }
+              }
+              for (int i = 1;i <= numberOfUsers;i++){
+                  for (int j = 1;j <= numberOfUsers;j++){
+                    simMatrix[i][j] = getSimilarity(matrix, avgMatrix, i, j, numberOfItems);
+                  }
+              }
+              for (int i = 1;i <= numberOfUsers;i++){
+                  float avgRating = getAvgRatingOfUser(matrix,i,numberOfItems);
+                  getNeighbor(simMatrix, numberOfUsers, i, k, arr);
+                  for (int j = 1;j <= numberOfItems;j++){ 
+                    if (matrix[i][j] == 0) {
+                      matrix[i][j] = avgRating + getRating(matrix, simMatrix, avgMatrix, numberOfUsers, numberOfItems, k, arr, i, j);
+                    }
+                  }
+              }
+              printf("\n\n");
+              printf("Nhan phim bat ki de thoat.");
+              fflush(stdin);
+              getchar();
+              break;
+            case 2:
+              system("cls");
+              isInput = 1;
+              printf("******************************************************************************\n");
+              printf("*                                                                            *\n");
+              printf("*                             DOC INPUT TU FILE                              *\n");
+              printf("*                                                                            *\n");
+              printf("******************************************************************************\n\n\n");
+              char fileName[30];
+              printf("Nhap ten file: ");
+              fflush(stdin);
+              gets(fileName);
+              inputMatrix(fileName, matrix, numberOfUsers, numberOfItems);
+              inputMatrix(fileName, matrix2, numberOfUsers, numberOfItems);
+              k = numberOfUsers/2;
+              for (int i = 1;i <= numberOfUsers;i++){
+                  float avgRatingOfUser = getAvgRatingOfUser(matrix, i, numberOfItems);
+                  for (int j = 1;j <= numberOfItems;j++){
+                    if (matrix[i][j] != 0) avgMatrix[i][j] = matrix[i][j] - avgRatingOfUser;
+                      else avgMatrix[i][j] = 0;
+                  }
+              }
+              for (int i = 1;i <= numberOfUsers;i++){
+                  for (int j = 1;j <= numberOfUsers;j++){
+                    simMatrix[i][j] = getSimilarity(matrix, avgMatrix, i, j, numberOfItems);
+                  }
+              }for (int i = 1;i <= numberOfUsers;i++){
+                  float avgRating = getAvgRatingOfUser(matrix,i,numberOfItems);
+                  getNeighbor(simMatrix, numberOfUsers, i, k, arr);
+                  for (int j = 1;j <= numberOfItems;j++){ 
+                    if (matrix[i][j] == 0) {
+                      matrix[i][j] = avgRating + getRating(matrix, simMatrix, avgMatrix, numberOfUsers, numberOfItems, k, arr, i, j);
+                    }
+                  }
+              }
+              printf("\n\n");
+              printf("Nhan phim bat ki de thoat.");
+              fflush(stdin);
+              getchar();
+              break;
+          }
+        }while(inputOption != 3);
+        break;
+      case 2:
+        if (isInput == 0) {
+          system("cls");
+          printf("Input chua duoc doc.\n");
+          printf("Nhan phim bat ki de quay lai.\n");
+          fflush(stdin);
+          getchar();
+          break;
+        }
+        int outputOption;
+        do {
+          system("cls");
+          printf("******************************************************************************\n");
+          printf("*                                                                            *\n");
+          printf("*                      DO AN: LAP TRINH TINH TOAN                            *\n");
+          printf("*               DE TAI: DU DOAN DIEM DANH GIA NGUOI DUNG                     *\n");
+          printf("*                                                                            *\n");
+          printf("******************************************************************************\n");
+          printf("\n\n");
+          printf("****************************   OUTPUT MENU  **********************************\n");
+          printf("*                                                                            *\n");
+          printf("*   1. Hien thi ma tran dau vao.                                             *\n");
+          printf("*   2. Hien thi ma tran tuong duong.                                         *\n");
+          printf("*   3. Hien thi ket qua ra man hinh.                                         *\n");
+          printf("*   4. Ghi ket qua ra file.                                                  *\n");
+          printf("*   5. Exit                                                                  *\n");
+          printf("*                                                                            *\n");
+          printf("******************************************************************************\n\n\n\n");
+          printf("Nhap lua chon: ");
+          scanf("%d",&outputOption);
+          switch(outputOption){
+            case 1:
+              system("cls");
+              printf("******************************************************************************\n");
+              printf("*                                                                            *\n");
+              printf("*                             MA TRAN DAU VAO                                *\n");
+              printf("*                                                                            *\n");
+              printf("******************************************************************************\n\n\n");
+              xuat_matran(matrix2, numberOfUsers, numberOfItems);
+              printf("\n\n\n");
+              printf("Nhan phim bat ki de thoat.");
+              fflush(stdin);
+              getchar();
+              break;
+            case 2:
+              system("cls");
+              printf("******************************************************************************\n");
+              printf("*                                                                            *\n");
+              printf("*                             MA TRAN TUONG DUONG                            *\n");
+              printf("*                                                                            *\n");
+              printf("******************************************************************************\n\n\n");
+              xuat_matran(simMatrix, numberOfUsers, numberOfUsers);
+              printf("\n\n\n");
+              printf("Nhan phim bat ki de thoat.");
+              fflush(stdin);
+              getchar();
+              break;
+            case 3:
+              system("cls");
+              printf("******************************************************************************\n");
+              printf("*                                                                            *\n");
+              printf("*                         HIEN THI KET QUA RA MAN HINH                       *\n");
+              printf("*                                                                            *\n");
+              printf("******************************************************************************\n\n\n");
+              xuat_matran(matrix, numberOfUsers, numberOfItems);
+              printf("\n\n\n");
+              printf("Nhan phim bat ki de thoat.");
+              fflush(stdin);
+              getchar();
+            case 4:
+              system("cls");
+              printf("******************************************************************************\n");
+              printf("*                                                                            *\n");
+              printf("*                              GHI KET QUA VAO FILE                          *\n");
+              printf("*                                                                            *\n");
+              printf("******************************************************************************\n\n\n");
+              char fileName[30];
+              printf("Nhap ten file: ");
+              fflush(stdin);
+              gets(fileName);
+              outputMatrix(fileName,matrix,numberOfUsers,numberOfItems);
+              printf("\n\n\n");
+              printf("Nhan phim bat ki de thoat.");
+              fflush(stdin);
+              getchar();
+          }
+        }while(outputOption != 5);
     }
-  }
-  // Trừ giá trị rating cho rating trung bình lưu vào ma trận avgMatrix
-
-  // Gán giá trị sim vào ma trận
-  for (int i = 1;i <= numberOfUsers;i++){
-
-    for (int j = 1;j <= numberOfUsers;j++){
-      simMatrix[i][j] = getSimilarity(matrix, avgMatrix, i, j, numberOfItems);
-    }
-  }  
-  xuat_matran(simMatrix, numberOfUsers, numberOfUsers); 
-  for (int i = 1;i <= numberOfUsers;i++){
-    float avgRating = getAvgRatingOfUser(matrix,i,numberOfItems);
-    getNeighbor(simMatrix, numberOfUsers, i, k, arr);
-    for (int j = 1;j <= numberOfItems;j++){ 
-      if (matrix[i][j] == 0) {
-        matrix[i][j] = avgRating + getRating(matrix, simMatrix, avgMatrix, numberOfUsers, numberOfItems, k, arr, i, j);
-      }
-    }
-  }
-  printf("\n");
-  xuat_matran(matrix, numberOfUsers, numberOfItems);
-  /*
-  printf("******************************************************************************\n");
-  printf("*                                                                            *\n");
-  printf("*                      DO AN: LAP TRINH TINH TOAN                            *\n");
-  printf("*               DE TAI: DU DOAN DIEM DANH GIA NGUOI DUNG                     *\n");
-  printf("*                                                                            *\n");
-  printf("******************************************************************************\n");
-  printf("\n\n");
-  printf("********************************  MENU   *************************************\n");
-  printf("*                                                                            *\n");
-  printf("*   1. Doc du lieu tu file                                                   *\n");
-  */
+  }while(optionMenu != 3);
   return 0;
 }
 // Hàm xuất ma trận
+void saochep(float matrix1[50][50],float matrix2[50][50],int rows,int columns){
+  for (int i = 1;i <= rows;i++){
+    for (int j = 1;j <= columns;j++) matrix2[i][j] = matrix1[i][j];
+  }
+}
 void xuat_matran(float matrix[50][50],int numberOfUsers,int numberOfItems){
   for(int i = 1; i <= numberOfUsers; i++) {
     for (int j = 1; j <= numberOfItems; j++) printf("%f\t",matrix[i][j]);
     printf("\n");
   } 
 } 
- // Hàm đọc giá trị ma trận từ file
+void inputMatrixFromKeyBoard(float matrix[50][50], int &numberOfUsers, int &numberOfItems){
+  printf("Nhap so luong nguoi dung: ");scanf("%d",&numberOfUsers);
+  printf("Nhap so luong san pham: ");scanf("%d",&numberOfItems);
+  printf("Nhap vao ma tran.\n");
+  for (int i = 1;i <= numberOfUsers;i++){
+    for (int j = 1;j <= numberOfItems;j++){
+      scanf("%f",&matrix[i][j]);
+    }
+  }
+} 
+// Hàm đọc giá trị ma trận từ file
 void inputMatrix(char fileName[], float matrix[50][50], int &numberOfUsers, int &numberOfItems){
   FILE *fptr;
   fptr = fopen(fileName,"r");
@@ -101,7 +285,7 @@ void outputMatrix(char fileName[], float matrix[50][50], int rows, int columns){
 	FILE *fptr = fopen(fileName,"w");
 	if (fptr == NULL){
 		printf("Can't open file.");
-		//exit(1);
+		exit(1);
 	}else{
 		for (int i = 1;i <= rows;i++){
 			for (int j = 1;j <= columns;j++) fprintf(fptr, "%2.2f\t", matrix[i][j]);

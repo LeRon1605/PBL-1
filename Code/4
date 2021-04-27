@@ -1,0 +1,49 @@
+/*
+  inputMatrixFromKeyBoard(matrix,numberOfUsers,numberOfItems);
+  int k = numberOfUsers/2;
+  int arr[k + 1];
+  //printf("Input matrix\n");
+  xuat_matran(matrix, numberOfUsers, numberOfItems);
+  outputMatrix("output.out", matrix, numberOfUsers, numberOfItems);
+  printf("\n\n\n");
+  //
+  for (int i = 1;i <= numberOfUsers;i++){
+    float avgRatingOfUser = getAvgRatingOfUser(matrix, i, numberOfItems);
+    for (int j = 1;j <= numberOfItems;j++){
+      if (matrix[i][j] != 0) avgMatrix[i][j] = matrix[i][j] - avgRatingOfUser;
+        else avgMatrix[i][j] = 0;
+    }
+  }
+  // Trừ giá trị rating cho rating trung bình lưu vào ma trận avgMatrix
+
+  // Gán giá trị sim vào ma trận
+  for (int i = 1;i <= numberOfUsers;i++){
+
+    for (int j = 1;j <= numberOfUsers;j++){
+      simMatrix[i][j] = getSimilarity(matrix, avgMatrix, i, j, numberOfItems);
+    }
+  }  
+  xuat_matran(simMatrix, numberOfUsers, numberOfUsers); 
+  for (int i = 1;i <= numberOfUsers;i++){
+    float avgRating = getAvgRatingOfUser(matrix,i,numberOfItems);
+    getNeighbor(simMatrix, numberOfUsers, i, k, arr);
+    for (int j = 1;j <= numberOfItems;j++){ 
+      if (matrix[i][j] == 0) {
+        matrix[i][j] = avgRating + getRating(matrix, simMatrix, avgMatrix, numberOfUsers, numberOfItems, k, arr, i, j);
+      }
+    }
+  }
+  printf("\n");
+  xuat_matran(matrix, numberOfUsers, numberOfItems);
+  /*
+  printf("******************************************************************************\n");
+  printf("*                                                                            *\n");
+  printf("*                      DO AN: LAP TRINH TINH TOAN                            *\n");
+  printf("*               DE TAI: DU DOAN DIEM DANH GIA NGUOI DUNG                     *\n");
+  printf("*                                                                            *\n");
+  printf("******************************************************************************\n");
+  printf("\n\n");
+  printf("********************************  MENU   *************************************\n");
+  printf("*                                                                            *\n");
+  printf("*   1. Doc du lieu tu file                                                   *\n");
+  */

@@ -1,58 +1,97 @@
 #include<stdio.h>
+#include<string.h>
 #include<conio.h>
 int main()
 { 
-	int option;
-	do {
-			printf("============================================================\n");
-			printf("==                                                        ==\n");
-			printf("==            DO AN: LAP TRINH TINH TOAN                  ==\n");
-			printf("==         DE TAI: DU DOAN DIEM DANH GIA NGUOI DUNG       ==\n");
-			printf("==                                                        ==\n");
-			printf("============================================================\n");
-			printf("==========================MENU==============================\n");
-			printf("==   1. DOC DU LIEU TU FILE                               ==\n");
-			printf("==   2. NHAP INPUT                                        ==\n");
-			printf("==   3. HIEN THI INPUT                                    ==\n");
-			printf("==   4. HIEN THI MA TRAN TUONG DUONG                      ==\n");
-			printf("==   5. HIEN THI HANG XOM                                 ==\n");
-			printf("==   6. GHI MA TRAN KET QUA RA FILE                       ==\n");
-			printf("==   7. IN KET QUA RA MAN HINH                            ==\n");
-			printf("==   8. KET THUC CHUONG TRINH                             ==\n");
-			printf("============================================================\n");
-			
-			printf("NHAP CHON:\n");
-			scanf("%d", &option);
-			switch(option)
-			{
-			case 1:  
-				printf("DOC DU LIEU TU FILE \n");
+	int optionMenu;
+	int isInput = 0;
+	do{
+		printf("******************************************************************************\n");
+		printf("*                                                                            *\n");
+		printf("*                      DO AN: LAP TRINH TINH TOAN                            *\n");
+		printf("*               DE TAI: DU DOAN DIEM DANH GIA NGUOI DUNG                     *\n");
+		printf("*                                                                            *\n");
+		printf("******************************************************************************\n");
+		printf("\n\n");
+		printf("********************************    MENU   ***********************************\n");
+		printf("*                                                                            *\n");
+		printf("*   1. Input                                                                 *\n");
+		printf("*   2. Output ket qua                                                        *\n");
+		printf("*   3. Exit                                                                  *\n");
+		printf("*                                                                            *\n");
+		printf("******************************************************************************\n\n\n\n");
+		printf("Nhap lua chon: ");
+		scanf("%d",&optionMenu);
+		switch(optionMenu){
+			case 1:
+				int inputOption;
+				do {
+					printf("******************************************************************************\n");
+					printf("*                                                                            *\n");
+					printf("*                      DO AN: LAP TRINH TINH TOAN                            *\n");
+					printf("*               DE TAI: DU DOAN DIEM DANH GIA NGUOI DUNG                     *\n");
+					printf("*                                                                            *\n");
+					printf("******************************************************************************\n");
+					printf("\n\n");
+					printf("****************************   INPUT MENU  ***********************************\n");
+					printf("*                                                                            *\n");
+					printf("*   1. Nhap input tu ban phim.                                               *\n");
+					printf("*   2. Doc input tu file.                                                    *\n");
+					printf("*   3. Exit                                                                  *\n");
+					printf("*                                                                            *\n");
+					printf("******************************************************************************\n\n\n\n");
+					printf("Nhap lua chon: ");
+					scanf("%d",&inputOption);
+					switch(inputOption){
+						case 1:
+							isInput = 1;
+							printf("******************************************************************************\n");
+							printf("*                                                                            *\n");
+							printf("*                        NHAP INPUT TU BAN PHIM                              *\n");
+							printf("*                                                                            *\n");
+							printf("******************************************************************************\n\n\n");
+							inputMatrixFromKeyBoard(matrix,numberOfUsers,numberOfItems);
+							break;
+						case 2:
+							isInput = 1;
+							printf("******************************************************************************\n");
+							printf("*                                                                            *\n");
+							printf("*                             DOC INPUT TU FILE                              *\n");
+							printf("*                                                                            *\n");
+							printf("******************************************************************************\n\n\n");
+							char fileName[30];
+							printf("Nhap ten file: ");
+							gets(fileName);
+							inputMatrix(fileName, matrix, numberOfUsers, numberOfItems);
+							break;
+					}
+				}while(inputOption != 3);
+				break;
+			case 2:
+				if (isInput == 0) break;
+				int outputOption;
+				do {
+					printf("******************************************************************************\n");
+					printf("*                                                                            *\n");
+					printf("*                      DO AN: LAP TRINH TINH TOAN                            *\n");
+					printf("*               DE TAI: DU DOAN DIEM DANH GIA NGUOI DUNG                     *\n");
+					printf("*                                                                            *\n");
+					printf("******************************************************************************\n");
+					printf("\n\n");
+					printf("****************************   OUTPUT MENU  **********************************\n");
+					printf("*                                                                            *\n");
+					printf("*   1. Hien thi ma tran dau vao.                                             *\n");
+					printf("*   2. Hien thi ma tran tuong duong.                                         *\n");
+					printf("*   3. Hien thi ket qua ra man hinh.                                         *\n");
+					printf("*   4. Ghi ket qua ra file.                                                  *\n");
+					printf("*   5. Exit                                                                  *\n");
+					printf("*                                                                            *\n");
+					printf("******************************************************************************\n\n\n\n");
+					printf("Nhap lua chon: ");
+					scanf("%d",&outputOption);
+				}while(outputOption != 5);
 
-				break;
-			case 2: 
-			    printf("NHAP INPUT \n");
-				break;
-			case 3: 
-			    printf("HIEN THI INPUT \n");
-				break;
-			case 4: 
-			    printf("HIEN THI MA TRAN TUONG DUONG \n");
-				break;
-			case 5: 
-			    printf("HIEN THI HANG XOM \n");
-				break;
-			case 6: 
-			    printf("GHI MA TRAN RA MAN HINH \n");
-				break;
-			case 7: 
-			    printf("IN KET QUA RA MAN HINH \n");
-				break;
-			case 8: 
-			    printf("KET THUC CHUONG TRINH \n");
-				break;
-			default:
-			    printf("NHAP SAI!!! MOI CHON LAI MENU.\n");
-			}
-    }while (option != 8) ;
+		}
+	}while(optionMenu != 3);
  return 0;
 }
