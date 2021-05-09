@@ -6,20 +6,22 @@ void inputMatrix(char fileName[], float matrix[50][50], int &numberOfUsers, int 
 void outputMatrix(char fileName[], float matrixOut[50][50], int columns,int rows); // Hàm xuất ma trận ra file
 float getAvgRatingOfUser(float matrix[50][50],int user,int numberOfItems); // Hàm lấy giá trị rating trung bình của người dùng
 float getSimilarityPearson(float matrix[50][50],float avgMatrix[50][50],int user1,int user2,int numberOfItems); // Hàm lấy giá trị sim giữa hai người dùng 
+float getSimilarityCosine(float matrix[50][50],int user1,int user2,int numberOfItems);
 void getNeighbor(float simMatrix[50][50],int numberOfUsers,int user, int k, int arr[]); // Hàm lấy neighbor
-float getRating(float matrix[50][50], float simMatrix[50][50],float avgMatrix[50][50], int numberOfUsers, int numberOfItems, int k, int arr[], int user, int item);
+float getRating(float matrix[50][50], float simMatrix[50][50],float calMatrix[50][50], int numberOfUsers, int numberOfItems, int k, int arr[], int user, int item);
 void swap(float *a, float *b);
-void saochep(float matrix1[50][50],float matrix2[50][50],int rows,int columns);
+void run(float matrix[50][50],float avgMatrix[50][50], float simMatrixPearson[50][50], float simMatrixCosine[50][50],float resultMatrixCosine[50][50], float resultMatrixPearson[50][50],int arrPearson[], int arrCosine[], int k, int numberOfUsers, int numberOfItems);
 int main(){
   int numberOfUsers, numberOfItems; 
   int k;
-  int arr[50];
+  int arrPearson[50];
+  int arrCosine[50];
   float matrix[50][50];
-  float matrix2[50][50];
   float avgMatrix[50][50];
-  float simMatrix[50][50];
-  float simMatrix2[50][50];
-  //inputMatrix("input.inp", matrix, numberOfUsers, numberOfItems);
+  float resultMatrixPearson[50][50];
+  float resultMatrixCosine[50][50];
+  float simMatrixPearson[50][50];
+  float simMatrixCosine[50][50];
   int optionMenu;
   int isInput = 0;
   do{
@@ -71,29 +73,7 @@ int main(){
               printf("*                                                                            *\n");
               printf("******************************************************************************\n\n\n");
               inputMatrixFromKeyBoard(matrix,numberOfUsers,numberOfItems);
-              saochep(matrix,matrix2,numberOfUsers,numberOfItems);
               k = numberOfUsers/2;
-              for (int i = 1;i <= numberOfUsers;i++){
-                  float avgRatingOfUser = getAvgRatingOfUser(matrix, i, numberOfItems);
-                  for (int j = 1;j <= numberOfItems;j++){
-                    if (matrix[i][j] != 0) avgMatrix[i][j] = matrix[i][j] - avgRatingOfUser;
-                      else avgMatrix[i][j] = 0;
-                  }
-              }
-              for (int i = 1;i <= numberOfUsers;i++){
-                  for (int j = 1;j <= numberOfUsers;j++){
-                    simMatrix[i][j] = getSimilarityPearson(matrix, avgMatrix, i, j, numberOfItems);
-                  }
-              }
-              for (int i = 1;i <= numberOfUsers;i++){
-                  float avgRating = getAvgRatingOfUser(matrix,i,numberOfItems);
-                  getNeighbor(simMatrix, numberOfUsers, i, k, arr);
-                  for (int j = 1;j <= numberOfItems;j++){ 
-                    if (matrix[i][j] == 0) {
-                      matrix[i][j] = avgRating + getRating(matrix, simMatrix, avgMatrix, numberOfUsers, numberOfItems, k, arr, i, j);
-                    }
-                  }
-              }
               printf("\n\n");
               printf("Nhan phim bat ki de thoat.");
               fflush(stdin);
@@ -112,28 +92,8 @@ int main(){
               fflush(stdin);
               gets(fileName);
               inputMatrix(fileName, matrix, numberOfUsers, numberOfItems);
-              inputMatrix(fileName, matrix2, numberOfUsers, numberOfItems);
+
               k = numberOfUsers/2;
-              for (int i = 1;i <= numberOfUsers;i++){
-                  float avgRatingOfUser = getAvgRatingOfUser(matrix, i, numberOfItems);
-                  for (int j = 1;j <= numberOfItems;j++){
-                    if (matrix[i][j] != 0) avgMatrix[i][j] = matrix[i][j] - avgRatingOfUser;
-                      else avgMatrix[i][j] = 0;
-                  }
-              }
-              for (int i = 1;i <= numberOfUsers;i++){
-                  for (int j = 1;j <= numberOfUsers;j++){
-                    simMatrix[i][j] = getSimilarityPearson(matrix, avgMatrix, i, j, numberOfItems);
-                  }
-              }for (int i = 1;i <= numberOfUsers;i++){
-                  float avgRating = getAvgRatingOfUser(matrix,i,numberOfItems);
-                  getNeighbor(simMatrix, numberOfUsers, i, k, arr);
-                  for (int j = 1;j <= numberOfItems;j++){ 
-                    if (matrix[i][j] == 0) {
-                      matrix[i][j] = avgRating + getRating(matrix, simMatrix, avgMatrix, numberOfUsers, numberOfItems, k, arr, i, j);
-                    }
-                  }
-              }
               printf("\n\n");
               printf("Nhan phim bat ki de thoat.");
               fflush(stdin);
@@ -150,10 +110,13 @@ int main(){
           fflush(stdin);
           getchar();
           break;
+        }else{
+          run(matrix,avgMatrix, simMatrixPearson, simMatrixCosine,resultMatrixCosine,  resultMatrixPearson, arrPearson,arrCosine,  k,  numberOfUsers,  numberOfItems);
         }
         int outputOption;
         do {
           system("cls");
+          printf("\n");
           printf("******************************************************************************\n");
           printf("*                                                                            *\n");
           printf("*                      DO AN: LAP TRINH TINH TOAN                            *\n");
@@ -164,10 +127,12 @@ int main(){
           printf("****************************   OUTPUT MENU  **********************************\n");
           printf("*                                                                            *\n");
           printf("*   1. Hien thi ma tran dau vao.                                             *\n");
-          printf("*   2. Hien thi ma tran tuong duong.                                         *\n");
-          printf("*   3. Hien thi ket qua ra man hinh.                                         *\n");
-          printf("*   4. Ghi ket qua ra file.                                                  *\n");
-          printf("*   5. Exit                                                                  *\n");
+          printf("*   2. Hien thi ma tran tuong duong pearson                                  *\n");
+          printf("*   3. Hien thi ma tran tuong duong cosine                                   *\n");
+          printf("*   4. Hien thi ket qua theo ham pearson ra man hinh.                        *\n");
+          printf("*   5. Hien thi ket qua theo ham cosine ra man hinh.                         *\n");
+          printf("*   6. Ghi ket qua ra file.                                                  *\n");
+          printf("*   7. Exit                                                                  *\n");
           printf("*                                                                            *\n");
           printf("******************************************************************************\n\n\n\n");
           printf("Nhap lua chon: ");
@@ -180,7 +145,7 @@ int main(){
               printf("*                             MA TRAN DAU VAO                                *\n");
               printf("*                                                                            *\n");
               printf("******************************************************************************\n\n\n");
-              xuat_matran(matrix2, numberOfUsers, numberOfItems);
+              xuat_matran(matrix, numberOfUsers, numberOfItems);
               printf("\n\n\n");
               printf("Nhan phim bat ki de thoat.");
               fflush(stdin);
@@ -190,10 +155,10 @@ int main(){
               system("cls");
               printf("******************************************************************************\n");
               printf("*                                                                            *\n");
-              printf("*                             MA TRAN TUONG DUONG                            *\n");
+              printf("*                        MA TRAN TUONG DUONG PEARSON                         *\n");
               printf("*                                                                            *\n");
               printf("******************************************************************************\n\n\n");
-              xuat_matran(simMatrix, numberOfUsers, numberOfUsers);
+              xuat_matran(simMatrixPearson, numberOfUsers, numberOfUsers);
               printf("\n\n\n");
               printf("Nhan phim bat ki de thoat.");
               fflush(stdin);
@@ -203,15 +168,42 @@ int main(){
               system("cls");
               printf("******************************************************************************\n");
               printf("*                                                                            *\n");
-              printf("*                         HIEN THI KET QUA RA MAN HINH                       *\n");
+              printf("*                        MA TRAN TUONG DUONG COSINE                          *\n");
               printf("*                                                                            *\n");
               printf("******************************************************************************\n\n\n");
-              xuat_matran(matrix, numberOfUsers, numberOfItems);
+              xuat_matran(simMatrixCosine, numberOfUsers, numberOfUsers);
               printf("\n\n\n");
               printf("Nhan phim bat ki de thoat.");
               fflush(stdin);
               getchar();
+              break;
             case 4:
+              system("cls");
+              printf("******************************************************************************\n");
+              printf("*                                                                            *\n");
+              printf("*                HIEN THI KET QUA THEO HAM PEARSON RA MAN HINH               *\n");
+              printf("*                                                                            *\n");
+              printf("******************************************************************************\n\n\n");
+              xuat_matran(resultMatrixPearson, numberOfUsers, numberOfItems);
+              printf("\n\n\n");
+              printf("Nhan phim bat ki de thoat.");
+              fflush(stdin);
+              getchar();
+              break;
+            case 5:
+              system("cls");
+              printf("******************************************************************************\n");
+              printf("*                                                                            *\n");
+              printf("*                HIEN THI KET QUA THEO HAM COSINE RA MAN HINH               *\n");
+              printf("*                                                                            *\n");
+              printf("******************************************************************************\n\n\n");
+              xuat_matran(resultMatrixCosine, numberOfUsers, numberOfItems);
+              printf("\n\n\n");
+              printf("Nhan phim bat ki de thoat.");
+              fflush(stdin);
+              getchar();
+              break;
+            case 6:
               system("cls");
               printf("******************************************************************************\n");
               printf("*                                                                            *\n");
@@ -227,18 +219,14 @@ int main(){
               printf("Nhan phim bat ki de thoat.");
               fflush(stdin);
               getchar();
+              break;
           }
-        }while(outputOption != 5);
+        }while(outputOption != 7);
     }
   }while(optionMenu != 3);
   return 0;
 }
 // Hàm xuất ma trận
-void saochep(float matrix1[50][50],float matrix2[50][50],int rows,int columns){
-  for (int i = 1;i <= rows;i++){
-    for (int j = 1;j <= columns;j++) matrix2[i][j] = matrix1[i][j];
-  }
-}
 void xuat_matran(float matrix[50][50],int numberOfUsers,int numberOfItems){
   for(int i = 1; i <= numberOfUsers; i++) {
     for (int j = 1; j <= numberOfItems; j++) printf("%f\t",matrix[i][j]);
@@ -306,7 +294,7 @@ float getAvgRatingOfUser(float matrix[50][50],int user,int numberOfItems){
   }
   return (sum/count);
 } 
-// Hàm lấy giá trị sim giữa hai người dùng 
+// Hàm lấy giá trị sim giữa hai người dùng Pearson
 float getSimilarityPearson(float matrix[50][50],float avgMatrix[50][50],int user1,int user2,int numberOfItems){
   float tuSo = 0;
   float sumOfUser1 = 0;
@@ -320,38 +308,95 @@ float getSimilarityPearson(float matrix[50][50],float avgMatrix[50][50],int user
   }
   return (tuSo/(sqrt(sumOfUser1)*sqrt(sumOfUser2)));
 }
+// Hàm lấy giá trị sim giữa hai người dùng Cosine
+float getSimilarityCosine(float matrix[50][50],int user1,int user2,int numberOfItems){
+  float tuSo = 0;
+  float sumOfUser1 = 0;
+  float sumOfUser2 = 0;
+  for (int i = 1;i <= numberOfItems;i++){
+    if (matrix[user1][i] * matrix[user2][i] != 0){
+      tuSo += matrix[user1][i]*matrix[user2][i];
+      sumOfUser1 += pow(matrix[user1][i], 2);
+      sumOfUser2 += pow(matrix[user2][i], 2);
+    }
+  }
+  return tuSo/(sqrt(sumOfUser1)*sqrt(sumOfUser2));
+}
 void swap(float *a, float *b){
   float temp = *a;
   *a = *b;
   *b = temp;
 }
 void getNeighbor(float simMatrix[50][50],int numberOfUsers,int user, int k, int arr[]) {
+  // Đưa giá trị min về cuối mảng
   int n = numberOfUsers;
-  int q = 1;
-  float simMatrix2[numberOfUsers + 1][numberOfUsers + 1];
+  float simMatrix_Copy[numberOfUsers + 1][numberOfUsers + 1];
   for (int j = 1;j <= numberOfUsers;j++){
-      simMatrix2[user][j] = simMatrix[user][j];
+      simMatrix_Copy[user][j] = simMatrix[user][j];
+      arr[j] = j;
   }
-  for (int i = 1;i <= k;i++){
-    float maxRating = (user == 1) ? simMatrix2[user][2] : simMatrix2[user][1];
+  swap(&simMatrix_Copy[user][user],&simMatrix_Copy[user][n]);
+  int temp = arr[user];
+  arr[user] = arr[n];
+  arr[n] = temp;
+  for (int i = 1;i < numberOfUsers;i++){
+    float minRating = (user == 1) ? simMatrix_Copy[user][2] : simMatrix_Copy[user][1];
     int index = (user == 1) ? 2 : 1;
-    for (int j = 1;j <= n;j++){
-        if (simMatrix2[user][j] > maxRating && simMatrix2[user][j] != 1){
-          maxRating = simMatrix2[user][j];
+    for (int j = 1;j < n;j++){
+        if (simMatrix_Copy[user][j] < minRating){
+          minRating = simMatrix_Copy[user][j];
           index = j;
         }
     }
-    arr[q++] = index;
-    swap(&simMatrix2[user][index], &simMatrix2[user][n]);
+    swap(&simMatrix_Copy[user][index], &simMatrix_Copy[user][n - 1]);
+    int temp = arr[index];
+    arr[index] = arr[n - 1];
+    arr[n - 1] = temp;
     n--;
   }
 }
-float getRating(float matrix[50][50], float simMatrix[50][50],float avgMatrix[50][50], int numberOfUsers, int numberOfItems, int k, int arr[], int user, int item){
+float getRating(float matrix[50][50], float simMatrix[50][50],float calMatrix[50][50], int numberOfUsers, int numberOfItems, int k, int arr[], int user, int item){
   float tuSo = 0;
   float mauSo = 0;
   for (int i = 1;i <= k;i++){
-     tuSo += simMatrix[arr[i]][user]*avgMatrix[arr[i]][item];
+     tuSo += simMatrix[arr[i]][user]*calMatrix[arr[i]][item];
      mauSo += abs(simMatrix[arr[i]][user]);
   }
   return (tuSo/mauSo);
+}
+void run(float matrix[50][50],float avgMatrix[50][50], float simMatrixPearson[50][50], float simMatrixCosine[50][50],float resultMatrixCosine[50][50], float resultMatrixPearson[50][50],int arrPearson[],int arrCosine[], int k, int numberOfUsers, int numberOfItems){
+    for (int i = 1;i <= numberOfUsers;i++){
+        float avgRatingOfUser = getAvgRatingOfUser(matrix, i, numberOfItems);
+            for (int j = 1;j <= numberOfItems;j++){
+                if (matrix[i][j] != 0) avgMatrix[i][j] = matrix[i][j] - avgRatingOfUser;
+                else avgMatrix[i][j] = 0;
+            }
+    }
+    for (int i = 1;i <= numberOfUsers;i++){
+        for (int j = 1;j <= numberOfUsers;j++){
+            simMatrixPearson[i][j] = getSimilarityPearson(matrix, avgMatrix, i, j, numberOfItems);
+            simMatrixCosine[i][j] = getSimilarityCosine(matrix, i, j, numberOfItems);
+        }
+    }
+    for (int i = 1;i <= numberOfUsers;i++){
+        float avgRating = getAvgRatingOfUser(matrix,i,numberOfItems);
+        getNeighbor(simMatrixPearson, numberOfUsers, i, k, arrPearson);
+        for (int j = 1;j <= numberOfItems;j++){ 
+           if (matrix[i][j] == 0) {
+              resultMatrixPearson[i][j] = avgRating + getRating(matrix, simMatrixPearson, avgMatrix, numberOfUsers, numberOfItems, k, arrPearson, i, j);
+            }else{
+              resultMatrixPearson[i][j] = matrix[i][j];
+            }
+        }
+    }
+    for (int i = 1;i <= numberOfUsers;i++){
+        getNeighbor(simMatrixCosine, numberOfUsers, i, k, arrCosine);
+        for (int j = 1;j <= numberOfItems;j++){ 
+            if (matrix[i][j] == 0) {
+                resultMatrixCosine[i][j] = getRating(matrix, simMatrixCosine, matrix, numberOfUsers, numberOfItems, k, arrCosine, i, j);
+            }else{
+                resultMatrixCosine[i][j] = matrix[i][j];
+            }
+        }
+    }
 }
