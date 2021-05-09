@@ -5,7 +5,7 @@ void inputMatrixFromKeyBoard(float matrix[50][50], int &numberOfUsers, int &numb
 void inputMatrix(char fileName[], float matrix[50][50], int &numberOfUsers, int &numberOfItems); // Hàm đọc giá trị ma trận từ file
 void outputMatrix(char fileName[], float matrixOut[50][50], int columns,int rows); // Hàm xuất ma trận ra file
 float getAvgRatingOfUser(float matrix[50][50],int user,int numberOfItems); // Hàm lấy giá trị rating trung bình của người dùng
-float getSimilarity(float matrix[50][50],float avgMatrix[50][50],int user1,int user2,int numberOfItems); // Hàm lấy giá trị sim giữa hai người dùng 
+float getSimilarityPearson(float matrix[50][50],float avgMatrix[50][50],int user1,int user2,int numberOfItems); // Hàm lấy giá trị sim giữa hai người dùng 
 void getNeighbor(float simMatrix[50][50],int numberOfUsers,int user, int k, int arr[]); // Hàm lấy neighbor
 float getRating(float matrix[50][50], float simMatrix[50][50],float avgMatrix[50][50], int numberOfUsers, int numberOfItems, int k, int arr[], int user, int item);
 void swap(float *a, float *b);
@@ -82,7 +82,7 @@ int main(){
               }
               for (int i = 1;i <= numberOfUsers;i++){
                   for (int j = 1;j <= numberOfUsers;j++){
-                    simMatrix[i][j] = getSimilarity(matrix, avgMatrix, i, j, numberOfItems);
+                    simMatrix[i][j] = getSimilarityPearson(matrix, avgMatrix, i, j, numberOfItems);
                   }
               }
               for (int i = 1;i <= numberOfUsers;i++){
@@ -123,7 +123,7 @@ int main(){
               }
               for (int i = 1;i <= numberOfUsers;i++){
                   for (int j = 1;j <= numberOfUsers;j++){
-                    simMatrix[i][j] = getSimilarity(matrix, avgMatrix, i, j, numberOfItems);
+                    simMatrix[i][j] = getSimilarityPearson(matrix, avgMatrix, i, j, numberOfItems);
                   }
               }for (int i = 1;i <= numberOfUsers;i++){
                   float avgRating = getAvgRatingOfUser(matrix,i,numberOfItems);
@@ -307,7 +307,7 @@ float getAvgRatingOfUser(float matrix[50][50],int user,int numberOfItems){
   return (sum/count);
 } 
 // Hàm lấy giá trị sim giữa hai người dùng 
-float getSimilarity(float matrix[50][50],float avgMatrix[50][50],int user1,int user2,int numberOfItems){
+float getSimilarityPearson(float matrix[50][50],float avgMatrix[50][50],int user1,int user2,int numberOfItems){
   float tuSo = 0;
   float sumOfUser1 = 0;
   float sumOfUser2 = 0;
