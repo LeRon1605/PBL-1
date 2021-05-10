@@ -36,8 +36,8 @@ int main(){
       printf("*                      DO AN: LAP TRINH TINH TOAN                            *\n");
       printf("*               DE TAI: DU DOAN DIEM DANH GIA NGUOI DUNG                     *\n");
       printf("*                                                                            *\n");
-      printf("*                                        SINH VIEN 1: LE QUOC RON.           *\n");
-      printf("*                                        SINH VIEN 1: TRAN DUY QUANG.        *\n");
+      printf("*   GIAO VIEN: NGUYEN VAN HIEU                SINH VIEN 1: LE QUOC RON.      *\n");
+      printf("*                                             SINH VIEN 2: TRAN DUY QUANG.   *\n");
       printf("*                                                                            *\n");
       printf("******************************************************************************\n");
       printf("\n\n");
@@ -251,6 +251,7 @@ int main(){
                 SetColor(0,7);
                 xuat_matran(resultMatrixCosine, numberOfUsers, numberOfItems, "Item", "User", 1,indexOfNoneRating);
                 SetColor(0,11);
+                
                 printf("\n\n\n");
                 printf("=> Nhan phim bat ki de thoat.");
                 fflush(stdin);
@@ -268,6 +269,11 @@ int main(){
                 fflush(stdin);
                 gets(fileName);
                 outputMatrix(fileName,matrix,numberOfUsers,numberOfItems);
+                fflush(stdin);
+                SetColor(0,2);
+                printf("=> Ghi thanh cong. Nhan phim bat ki de thoat");
+                SetColor(0,11);
+                getchar();
                 break;
             }
           }while(outputOption != 7);  
@@ -296,7 +302,7 @@ void xuat_matran(float matrix[50][50], int numberOfUsers, int numberOfItems, cha
         printf("\t %s %d\t",rowName, i);
         SetColor(0,7);
       }
-      if (i * j == indexOfNoneRating[q] && isResult == 1){
+      if (((i-1)*numberOfItems) + j == indexOfNoneRating[q] && isResult == 1){
         SetColor(0,6);
         q++;
       } 
@@ -457,7 +463,7 @@ void run(float matrix[50][50],float avgMatrix[50][50], float simMatrixPearson[50
         getNeighbor(simMatrixPearson, numberOfUsers, i, k, arrPearson);
         for (int j = 1;j <= numberOfItems;j++){ 
            if (matrix[i][j] == 0) {
-              indexOfNoneRating[q++] = i*j;
+              indexOfNoneRating[q++] = ((i-1)*numberOfItems) + j;
               resultMatrixPearson[i][j] = avgRating + getRating(matrix, simMatrixPearson, avgMatrix, numberOfUsers, numberOfItems, k, arrPearson, i, j);
             }else{
               resultMatrixPearson[i][j] = matrix[i][j];
