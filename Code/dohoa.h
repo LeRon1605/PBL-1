@@ -18,6 +18,3 @@ void SetColor(int backgound_color, int text_color)
     int color_code = backgound_color * 16 + text_color;
     SetConsoleTextAttribute(hStdout, color_code);
 }
-int add(int a,int b){
-	return a + b;
-}
