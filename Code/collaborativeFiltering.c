@@ -183,6 +183,7 @@ int main(){
             switch(outputOption){
               case 1:
                 system("cls");
+                printf("%d %d",numberOfUsers,numberOfItems);
                 printf("******************************************************************************\n");
                 printf("*                                                                            *\n");
                 printf("*                             MA TRAN DAU VAO                                *\n");
@@ -292,7 +293,7 @@ void xuat_matran(float matrix[50][50], int numberOfUsers, int numberOfItems, cha
     printf("%s %d  ", columnName, i);
     SetColor(0,7);
   }
-  for (int i = 1;i <= numberOfItems;i++){
+  for (int i = 1;i <= numberOfUsers;i++){
     printf("\n\t--------+");
     for (int j = 1;j <= numberOfItems;j++) printf("-------+");
     printf("\n");
@@ -393,11 +394,12 @@ float getSimilarityCosine(float matrix[50][50],int user1,int user2,int numberOfI
   float sumOfUser1 = 0;
   float sumOfUser2 = 0;
   for (int i = 1;i <= numberOfItems;i++){
-    if (matrix[user1][i] * matrix[user2][i] != 0){
+    if (matrix[user1][i]*matrix[user2][i] != 0){
       tuSo += matrix[user1][i]*matrix[user2][i];
       sumOfUser1 += pow(matrix[user1][i], 2);
       sumOfUser2 += pow(matrix[user2][i], 2);
     }
+    
   }
   return tuSo/(sqrt(sumOfUser1)*sqrt(sumOfUser2));
 }
@@ -471,10 +473,11 @@ void run(float matrix[50][50],float avgMatrix[50][50], float simMatrixPearson[50
         }
     }
     for (int i = 1;i <= numberOfUsers;i++){
+        float avgRating = getAvgRatingOfUser(matrix,i,numberOfItems);
         getNeighbor(simMatrixCosine, numberOfUsers, i, k, arrCosine);
         for (int j = 1;j <= numberOfItems;j++){ 
             if (matrix[i][j] == 0) {
-                resultMatrixCosine[i][j] = getRating(matrix, simMatrixCosine, matrix, numberOfUsers, numberOfItems, k, arrCosine, i, j);
+                resultMatrixCosine[i][j] = avgRating + getRating(matrix, simMatrixCosine, avgMatrix, numberOfUsers, numberOfItems, k, arrCosine, i, j);
             }else{
                 resultMatrixCosine[i][j] = matrix[i][j];
             }
