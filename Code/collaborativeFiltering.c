@@ -1,6 +1,8 @@
 #include<stdio.h>
+#include<windows.h>
+#include "dohoa.h"
 #include<math.h>
-void xuat_matran(float matrix[50][50],int numberOfUsers,int numberOfItems); // Hàm xuất ma trận
+void xuat_matran(float matrix[50][50],int numberOfUsers,int numberOfItems,char columnName[10],char rowName[10],int isResult, int indexOfNoneRating[]); // Hàm xuất ma trận
 void inputMatrixFromKeyBoard(float matrix[50][50], int &numberOfUsers, int &numberOfItems);
 void inputMatrix(char fileName[], float matrix[50][50], int &numberOfUsers, int &numberOfItems); // Hàm đọc giá trị ma trận từ file
 void outputMatrix(char fileName[], float matrixOut[50][50], int columns,int rows); // Hàm xuất ma trận ra file
@@ -10,229 +12,300 @@ float getSimilarityCosine(float matrix[50][50],int user1,int user2,int numberOfI
 void getNeighbor(float simMatrix[50][50],int numberOfUsers,int user, int k, int arr[]); // Hàm lấy neighbor
 float getRating(float matrix[50][50], float simMatrix[50][50],float calMatrix[50][50], int numberOfUsers, int numberOfItems, int k, int arr[], int user, int item);
 void swap(float *a, float *b);
-void run(float matrix[50][50],float avgMatrix[50][50], float simMatrixPearson[50][50], float simMatrixCosine[50][50],float resultMatrixCosine[50][50], float resultMatrixPearson[50][50],int arrPearson[], int arrCosine[], int k, int numberOfUsers, int numberOfItems);
+void run(float matrix[50][50],float avgMatrix[50][50], float simMatrixPearson[50][50], float simMatrixCosine[50][50],float resultMatrixCosine[50][50], float resultMatrixPearson[50][50],int indexOfNoneRating[],int arrPearson[], int arrCosine[], int k, int numberOfUsers, int numberOfItems);
 int main(){
   int numberOfUsers, numberOfItems; 
   int k;
   int arrPearson[50];
   int arrCosine[50];
+  int indexOfNoneRating[50];
   float matrix[50][50];
   float avgMatrix[50][50];
   float resultMatrixPearson[50][50];
   float resultMatrixCosine[50][50];
   float simMatrixPearson[50][50];
   float simMatrixCosine[50][50];
+  SetWindowSize(77,30);
   int optionMenu;
-  int isInput = 0;
-  do{
-    system("cls");
-    printf("******************************************************************************\n");
-    printf("*                                                                            *\n");
-    printf("*                      DO AN: LAP TRINH TINH TOAN                            *\n");
-    printf("*               DE TAI: DU DOAN DIEM DANH GIA NGUOI DUNG                     *\n");
-    printf("*                                                                            *\n");
-    printf("******************************************************************************\n");
-    printf("\n\n");
-    printf("********************************    MENU   ***********************************\n");
-    printf("*                                                                            *\n");
-    printf("*   1. Input                                                                 *\n");
-    printf("*   2. Output ket qua                                                        *\n");
-    printf("*   3. Exit                                                                  *\n");
-    printf("*                                                                            *\n");
-    printf("******************************************************************************\n\n\n\n");
-    printf("Nhap lua chon: ");
-    scanf("%d",&optionMenu);
-    switch(optionMenu){
-      case 1:
-        int inputOption;
-        do {
-          system("cls");
-          printf("******************************************************************************\n");
-          printf("*                                                                            *\n");
-          printf("*                      DO AN: LAP TRINH TINH TOAN                            *\n");
-          printf("*               DE TAI: DU DOAN DIEM DANH GIA NGUOI DUNG                     *\n");
-          printf("*                                                                            *\n");
-          printf("******************************************************************************\n");
-          printf("\n\n");
-          printf("****************************   INPUT MENU  ***********************************\n");
-          printf("*                                                                            *\n");
-          printf("*   1. Nhap input tu ban phim.                                               *\n");
-          printf("*   2. Doc input tu file.                                                    *\n");
-          printf("*   3. Exit                                                                  *\n");
-          printf("*                                                                            *\n");
-          printf("******************************************************************************\n\n\n\n");
-          printf("Nhap lua chon: ");
-          scanf("%d",&inputOption);
-          switch(inputOption){
-            case 1:
-              system("cls");
-              isInput = 1;
-              printf("******************************************************************************\n");
-              printf("*                                                                            *\n");
-              printf("*                        NHAP INPUT TU BAN PHIM                              *\n");
-              printf("*                                                                            *\n");
-              printf("******************************************************************************\n\n\n");
-              inputMatrixFromKeyBoard(matrix,numberOfUsers,numberOfItems);
-              k = numberOfUsers/2;
-              printf("\n\n");
-              printf("Nhan phim bat ki de thoat.");
-              fflush(stdin);
-              getchar();
-              break;
-            case 2:
-              system("cls");
-              isInput = 1;
-              printf("******************************************************************************\n");
-              printf("*                                                                            *\n");
-              printf("*                             DOC INPUT TU FILE                              *\n");
-              printf("*                                                                            *\n");
-              printf("******************************************************************************\n\n\n");
-              char fileName[30];
-              printf("Nhap ten file: ");
-              fflush(stdin);
-              gets(fileName);
-              inputMatrix(fileName, matrix, numberOfUsers, numberOfItems);
-
-              k = numberOfUsers/2;
-              printf("\n\n");
-              printf("Nhan phim bat ki de thoat.");
-              fflush(stdin);
-              getchar();
-              break;
-          }
-        }while(inputOption != 3);
-        break;
-      case 2:
-        if (isInput == 0) {
-          system("cls");
-          printf("Input chua duoc doc.\n");
-          printf("Nhan phim bat ki de quay lai.\n");
-          fflush(stdin);
-          getchar();
+    int isInput = 0;
+    do{
+      system("cls");
+      SetColor(0,11);
+      printf("******************************************************************************\n");
+      printf("*                                                                            *\n");
+      printf("*                      DO AN: LAP TRINH TINH TOAN                            *\n");
+      printf("*               DE TAI: DU DOAN DIEM DANH GIA NGUOI DUNG                     *\n");
+      printf("*                                                                            *\n");
+      printf("*                                        SINH VIEN 1: LE QUOC RON.           *\n");
+      printf("*                                        SINH VIEN 1: TRAN DUY QUANG.        *\n");
+      printf("*                                                                            *\n");
+      printf("******************************************************************************\n");
+      printf("\n\n");
+      printf("********************************    MENU   ***********************************\n");
+      printf("*                                                                            *\n");
+      printf("*   1. Input                                                                 *\n");
+      printf("*   2. Output ket qua                                                        *\n");
+      printf("*   3. Exit                                                                  *\n");
+      printf("*                                                                            *\n");
+      printf("******************************************************************************\n\n\n\n");
+      printf("=> Nhap lua chon: ");
+      scanf("%d",&optionMenu);
+      while (optionMenu < 1 || optionMenu > 3){
+          SetColor(0,4);
+          printf("=> Khong ton tai lua chon. Vui long nhap lai: ");
+          SetColor(0,11);
+          scanf("%d",&optionMenu);
+      }
+      switch(optionMenu){
+        case 1:
+          int inputOption;
+          do {
+            system("cls");
+            SetColor(0,11);
+            printf("******************************************************************************\n");
+            printf("*                                                                            *\n");
+            printf("*                      DO AN: LAP TRINH TINH TOAN                            *\n");
+            printf("*               DE TAI: DU DOAN DIEM DANH GIA NGUOI DUNG                     *\n");
+            printf("*                                                                            *\n");
+            printf("******************************************************************************\n");
+            printf("\n\n");
+            printf("****************************   INPUT MENU  ***********************************\n");
+            printf("*                                                                            *\n");
+            printf("*   1. Nhap input tu ban phim.                                               *\n");
+            printf("*   2. Doc input tu file.                                                    *\n");
+            printf("*   3. Quay ve menu chinh.                                                   *\n");
+            printf("*                                                                            *\n");
+            printf("******************************************************************************\n\n\n\n");
+            printf("=> Nhap lua chon: ");
+            scanf("%d",&inputOption);
+            while (inputOption < 1 || inputOption > 3){
+                SetColor(0,4);
+                printf("=> Khong ton tai lua chon. Vui long nhap lai: ");
+                SetColor(0,11);
+                scanf("%d",&inputOption);
+            }
+            switch(inputOption){
+              case 1:
+                system("cls");
+                SetColor(0,11);
+                isInput = 1;
+                printf("******************************************************************************\n");
+                printf("*                                                                            *\n");
+                printf("*                        NHAP INPUT TU BAN PHIM                              *\n");
+                printf("*                                                                            *\n");
+                printf("******************************************************************************\n\n\n");
+                printf("\n\n");
+                inputMatrixFromKeyBoard(matrix,numberOfUsers,numberOfItems);
+                k = numberOfUsers/2;
+                SetColor(0,2);
+                printf("\n");
+                printf("=> Nhap thanh cong. Nhap phim bat ki de thoat");
+                SetColor(0,11);
+                fflush(stdin);
+                getchar();
+                break;
+              case 2:
+                system("cls");
+                SetColor(0,11);
+                isInput = 1;
+                printf("******************************************************************************\n");
+                printf("*                                                                            *\n");
+                printf("*                             DOC INPUT TU FILE                              *\n");
+                printf("*                                                                            *\n");
+                printf("******************************************************************************\n\n\n");
+                printf("\n\n");
+                char fileName[30];
+                printf("=> Nhap ten file: ");
+                fflush(stdin);
+                gets(fileName);
+                inputMatrix(fileName, matrix, numberOfUsers, numberOfItems);
+                k = numberOfUsers/2;
+                printf("\n");
+                SetColor(0,2);
+                printf("=> Doc file thanh cong. Nhap phim bat ki de thoat");
+                SetColor(0,11);
+                fflush(stdin);
+                getchar();
+                break;
+            }
+          }while(inputOption != 3);
           break;
-        }else{
-          run(matrix,avgMatrix, simMatrixPearson, simMatrixCosine,resultMatrixCosine,  resultMatrixPearson, arrPearson,arrCosine,  k,  numberOfUsers,  numberOfItems);
-        }
-        int outputOption;
-        do {
-          system("cls");
-          printf("\n");
-          printf("******************************************************************************\n");
-          printf("*                                                                            *\n");
-          printf("*                      DO AN: LAP TRINH TINH TOAN                            *\n");
-          printf("*               DE TAI: DU DOAN DIEM DANH GIA NGUOI DUNG                     *\n");
-          printf("*                                                                            *\n");
-          printf("******************************************************************************\n");
-          printf("\n\n");
-          printf("****************************   OUTPUT MENU  **********************************\n");
-          printf("*                                                                            *\n");
-          printf("*   1. Hien thi ma tran dau vao.                                             *\n");
-          printf("*   2. Hien thi ma tran tuong duong pearson                                  *\n");
-          printf("*   3. Hien thi ma tran tuong duong cosine                                   *\n");
-          printf("*   4. Hien thi ket qua theo ham pearson ra man hinh.                        *\n");
-          printf("*   5. Hien thi ket qua theo ham cosine ra man hinh.                         *\n");
-          printf("*   6. Ghi ket qua ra file.                                                  *\n");
-          printf("*   7. Exit                                                                  *\n");
-          printf("*                                                                            *\n");
-          printf("******************************************************************************\n\n\n\n");
-          printf("Nhap lua chon: ");
-          scanf("%d",&outputOption);
-          switch(outputOption){
-            case 1:
-              system("cls");
-              printf("******************************************************************************\n");
-              printf("*                                                                            *\n");
-              printf("*                             MA TRAN DAU VAO                                *\n");
-              printf("*                                                                            *\n");
-              printf("******************************************************************************\n\n\n");
-              xuat_matran(matrix, numberOfUsers, numberOfItems);
-              printf("\n\n\n");
-              printf("Nhan phim bat ki de thoat.");
-              fflush(stdin);
-              getchar();
-              break;
-            case 2:
-              system("cls");
-              printf("******************************************************************************\n");
-              printf("*                                                                            *\n");
-              printf("*                        MA TRAN TUONG DUONG PEARSON                         *\n");
-              printf("*                                                                            *\n");
-              printf("******************************************************************************\n\n\n");
-              xuat_matran(simMatrixPearson, numberOfUsers, numberOfUsers);
-              printf("\n\n\n");
-              printf("Nhan phim bat ki de thoat.");
-              fflush(stdin);
-              getchar();
-              break;
-            case 3:
-              system("cls");
-              printf("******************************************************************************\n");
-              printf("*                                                                            *\n");
-              printf("*                        MA TRAN TUONG DUONG COSINE                          *\n");
-              printf("*                                                                            *\n");
-              printf("******************************************************************************\n\n\n");
-              xuat_matran(simMatrixCosine, numberOfUsers, numberOfUsers);
-              printf("\n\n\n");
-              printf("Nhan phim bat ki de thoat.");
-              fflush(stdin);
-              getchar();
-              break;
-            case 4:
-              system("cls");
-              printf("******************************************************************************\n");
-              printf("*                                                                            *\n");
-              printf("*                HIEN THI KET QUA THEO HAM PEARSON RA MAN HINH               *\n");
-              printf("*                                                                            *\n");
-              printf("******************************************************************************\n\n\n");
-              xuat_matran(resultMatrixPearson, numberOfUsers, numberOfItems);
-              printf("\n\n\n");
-              printf("Nhan phim bat ki de thoat.");
-              fflush(stdin);
-              getchar();
-              break;
-            case 5:
-              system("cls");
-              printf("******************************************************************************\n");
-              printf("*                                                                            *\n");
-              printf("*                HIEN THI KET QUA THEO HAM COSINE RA MAN HINH               *\n");
-              printf("*                                                                            *\n");
-              printf("******************************************************************************\n\n\n");
-              xuat_matran(resultMatrixCosine, numberOfUsers, numberOfItems);
-              printf("\n\n\n");
-              printf("Nhan phim bat ki de thoat.");
-              fflush(stdin);
-              getchar();
-              break;
-            case 6:
-              system("cls");
-              printf("******************************************************************************\n");
-              printf("*                                                                            *\n");
-              printf("*                              GHI KET QUA VAO FILE                          *\n");
-              printf("*                                                                            *\n");
-              printf("******************************************************************************\n\n\n");
-              char fileName[30];
-              printf("Nhap ten file: ");
-              fflush(stdin);
-              gets(fileName);
-              outputMatrix(fileName,matrix,numberOfUsers,numberOfItems);
-              printf("\n\n\n");
-              printf("Nhan phim bat ki de thoat.");
-              fflush(stdin);
-              getchar();
-              break;
+        case 2:
+          if (isInput == 0) {
+            system("cls");
+            SetColor(0,4);
+            printf("******************************************************************************\n");
+            printf("*                                                                            *\n");
+            printf("*                      ERROR: INPUT CHUA DUOC DOC                            *\n");
+            printf("*                   ");
+            SetColor(0,2);
+            printf("NHAP PHIM BAT KI DE QUAY LAI MENU");
+            SetColor(0,4);
+            printf("                        *\n");
+            printf("*                                                                            *\n");
+            printf("******************************************************************************\n");
+            fflush(stdin);
+            getchar();
+            break;
+          }else{
+            run(matrix,avgMatrix, simMatrixPearson, simMatrixCosine,resultMatrixCosine,  resultMatrixPearson,indexOfNoneRating, arrPearson,arrCosine,  k,  numberOfUsers,  numberOfItems);
           }
-        }while(outputOption != 7);
-    }
-  }while(optionMenu != 3);
-  return 0;
+          int outputOption;
+          do {
+            system("cls");
+            printf("\n");
+            printf("******************************************************************************\n");
+            printf("*                                                                            *\n");
+            printf("*                      DO AN: LAP TRINH TINH TOAN                            *\n");
+            printf("*               DE TAI: DU DOAN DIEM DANH GIA NGUOI DUNG                     *\n");
+            printf("*                                                                            *\n");
+            printf("******************************************************************************\n");
+            printf("\n\n");
+            printf("****************************   OUTPUT MENU  **********************************\n");
+            printf("*                                                                            *\n");
+            printf("*   1. Hien thi ma tran dau vao.                                             *\n");
+            printf("*   2. Hien thi ma tran tuong duong pearson                                  *\n");
+            printf("*   3. Hien thi ma tran tuong duong cosine                                   *\n");
+            printf("*   4. Hien thi ket qua theo ham pearson ra man hinh.                        *\n");
+            printf("*   5. Hien thi ket qua theo ham cosine ra man hinh.                         *\n");
+            printf("*   6. Ghi ket qua ra file.                                                  *\n");
+            printf("*   7. Exit                                                                  *\n");
+            printf("*                                                                            *\n");
+            printf("******************************************************************************\n\n\n\n");
+            printf("=> Nhap lua chon: ");
+            scanf("%d",&outputOption);
+            while (outputOption < 1 || outputOption > 7){
+                SetColor(0,4);
+                printf("=> Khong ton tai lua chon. Vui long nhap lai: ");
+                SetColor(0,11);
+                scanf("%d",&outputOption);
+            }
+            switch(outputOption){
+              case 1:
+                system("cls");
+                printf("******************************************************************************\n");
+                printf("*                                                                            *\n");
+                printf("*                             MA TRAN DAU VAO                                *\n");
+                printf("*                                                                            *\n");
+                printf("******************************************************************************\n\n\n");
+                SetColor(0,7);
+                xuat_matran(matrix, numberOfUsers, numberOfItems, "Item", "User", 1, indexOfNoneRating);   
+                SetColor(0,11);          
+                printf("\n\n\n");
+                printf("=> Nhan phim bat ki de thoat.");
+                fflush(stdin);
+                getchar();
+                break;
+              case 2:
+                system("cls");
+                printf("******************************************************************************\n");
+                printf("*                                                                            *\n");
+                printf("*                        MA TRAN TUONG DUONG PEARSON                         *\n");
+                printf("*                                                                            *\n");
+                printf("******************************************************************************\n\n\n");
+                SetColor(0,7);
+                xuat_matran(simMatrixPearson, numberOfUsers, numberOfUsers, "User", "User", 0, indexOfNoneRating);
+                SetColor(0,11);
+                printf("\n\n\n");
+                printf("=> Nhan phim bat ki de thoat.");
+                fflush(stdin);
+                getchar();
+                break;
+              case 3:
+                system("cls");
+                printf("******************************************************************************\n");
+                printf("*                                                                            *\n");
+                printf("*                        MA TRAN TUONG DUONG COSINE                          *\n");
+                printf("*                                                                            *\n");
+                printf("******************************************************************************\n\n\n");
+                SetColor(0,7);
+                xuat_matran(simMatrixCosine, numberOfUsers, numberOfUsers, "User", "User", 0, indexOfNoneRating);
+                SetColor(0,11);
+                printf("\n\n\n");
+                printf("=> Nhan phim bat ki de thoat.");
+                fflush(stdin);
+                getchar();
+                break;
+              case 4:
+                system("cls");
+                printf("******************************************************************************\n");
+                printf("*                                                                            *\n");
+                printf("*                HIEN THI KET QUA THEO HAM PEARSON RA MAN HINH               *\n");
+                printf("*                                                                            *\n");
+                printf("******************************************************************************\n\n\n");
+                SetColor(0,7);
+                xuat_matran(resultMatrixPearson, numberOfUsers, numberOfItems, "Item", "User", 1,indexOfNoneRating);
+                SetColor(0,11);
+                printf("\n\n\n");
+                printf("=> Nhan phim bat ki de thoat.");
+                fflush(stdin);
+                getchar();
+                break;
+              case 5:
+                system("cls");
+                printf("******************************************************************************\n");
+                printf("*                                                                            *\n");
+                printf("*                HIEN THI KET QUA THEO HAM COSINE RA MAN HINH               *\n");
+                printf("*                                                                            *\n");
+                printf("******************************************************************************\n\n\n");
+                SetColor(0,7);
+                xuat_matran(resultMatrixCosine, numberOfUsers, numberOfItems, "Item", "User", 1,indexOfNoneRating);
+                SetColor(0,11);
+                printf("\n\n\n");
+                printf("=> Nhan phim bat ki de thoat.");
+                fflush(stdin);
+                getchar();
+                break;
+              case 6:
+                system("cls");
+                printf("******************************************************************************\n");
+                printf("*                                                                            *\n");
+                printf("*                              GHI KET QUA VAO FILE                          *\n");
+                printf("*                                                                            *\n");
+                printf("******************************************************************************\n\n\n");
+                char fileName[30];
+                printf("=> Nhap ten file: ");
+                fflush(stdin);
+                gets(fileName);
+                outputMatrix(fileName,matrix,numberOfUsers,numberOfItems);
+                break;
+            }
+          }while(outputOption != 7);  
+      }
+    }while(optionMenu != 3); 
+    return 0;
 }
+
+ 
 // Hàm xuất ma trận
-void xuat_matran(float matrix[50][50],int numberOfUsers,int numberOfItems){
-  for(int i = 1; i <= numberOfUsers; i++) {
-    for (int j = 1; j <= numberOfItems; j++) printf("%f\t",matrix[i][j]);
+void xuat_matran(float matrix[50][50], int numberOfUsers, int numberOfItems, char columnName[10], char rowName[10], int isResult, int indexOfNoneRating[]){
+  int q = 0;
+  printf("\t\t  ");
+  for (int i = 1;i <= numberOfItems;i++){
+    SetColor(0,2);
+    printf("%s %d  ", columnName, i);
+    SetColor(0,7);
+  }
+  for (int i = 1;i <= numberOfItems;i++){
+    printf("\n\t--------+");
+    for (int j = 1;j <= numberOfItems;j++) printf("-------+");
     printf("\n");
-  } 
-} 
+    for (int j = 1;j <= numberOfItems;j++){
+      if (j == 1) {
+        SetColor(0,2);
+        printf("\t %s %d\t",rowName, i);
+        SetColor(0,7);
+      }
+      if (i * j == indexOfNoneRating[q] && isResult == 1){
+        SetColor(0,6);
+        q++;
+      } 
+      if (matrix[i][j] < 0) printf("| %5.2f ",matrix[i][j]);
+      else printf("| %5.3f ",matrix[i][j]);
+      SetColor(0,7);
+    }
+  }
+}
 void inputMatrixFromKeyBoard(float matrix[50][50], int &numberOfUsers, int &numberOfItems){
   printf("Nhap so luong nguoi dung: ");scanf("%d",&numberOfUsers);
   printf("Nhap so luong san pham: ");scanf("%d",&numberOfItems);
@@ -364,7 +437,8 @@ float getRating(float matrix[50][50], float simMatrix[50][50],float calMatrix[50
   }
   return (tuSo/mauSo);
 }
-void run(float matrix[50][50],float avgMatrix[50][50], float simMatrixPearson[50][50], float simMatrixCosine[50][50],float resultMatrixCosine[50][50], float resultMatrixPearson[50][50],int arrPearson[],int arrCosine[], int k, int numberOfUsers, int numberOfItems){
+void run(float matrix[50][50],float avgMatrix[50][50], float simMatrixPearson[50][50], float simMatrixCosine[50][50],float resultMatrixCosine[50][50], float resultMatrixPearson[50][50],int indexOfNoneRating[],int arrPearson[],int arrCosine[], int k, int numberOfUsers, int numberOfItems){
+    int q = 0;
     for (int i = 1;i <= numberOfUsers;i++){
         float avgRatingOfUser = getAvgRatingOfUser(matrix, i, numberOfItems);
             for (int j = 1;j <= numberOfItems;j++){
@@ -383,6 +457,7 @@ void run(float matrix[50][50],float avgMatrix[50][50], float simMatrixPearson[50
         getNeighbor(simMatrixPearson, numberOfUsers, i, k, arrPearson);
         for (int j = 1;j <= numberOfItems;j++){ 
            if (matrix[i][j] == 0) {
+              indexOfNoneRating[q++] = i*j;
               resultMatrixPearson[i][j] = avgRating + getRating(matrix, simMatrixPearson, avgMatrix, numberOfUsers, numberOfItems, k, arrPearson, i, j);
             }else{
               resultMatrixPearson[i][j] = matrix[i][j];
