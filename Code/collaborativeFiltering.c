@@ -183,7 +183,6 @@ int main(){
             switch(outputOption){
               case 1:
                 system("cls");
-                printf("%d %d",numberOfUsers,numberOfItems);
                 printf("******************************************************************************\n");
                 printf("*                                                                            *\n");
                 printf("*                             MA TRAN DAU VAO                                *\n");
@@ -287,28 +286,29 @@ int main(){
 // Hàm xuất ma trận
 void xuat_matran(float matrix[50][50], int numberOfUsers, int numberOfItems, char columnName[10], char rowName[10], int isResult, int indexOfNoneRating[]){
   int q = 0;
-  printf("\t\t  ");
+  printf("\t\t ");
   for (int i = 1;i <= numberOfItems;i++){
     SetColor(0,2);
-    printf("%s %d  ", columnName, i);
+    printf(" %-5s%-4d", columnName, i);
     SetColor(0,7);
   }
   for (int i = 1;i <= numberOfUsers;i++){
     printf("\n\t--------+");
-    for (int j = 1;j <= numberOfItems;j++) printf("-------+");
+    for (int j = 1;j <= numberOfItems;j++) printf("---------+");
     printf("\n");
     for (int j = 1;j <= numberOfItems;j++){
       if (j == 1) {
         SetColor(0,2);
-        printf("\t %s %d\t",rowName, i);
+        printf("\t%s %d\t",rowName, i);
         SetColor(0,7);
       }
+      printf("|");
       if (((i-1)*numberOfItems) + j == indexOfNoneRating[q] && isResult == 1){
         SetColor(0,6);
         q++;
       } 
-      if (matrix[i][j] < 0) printf("| %5.2f ",matrix[i][j]);
-      else printf("| %5.3f ",matrix[i][j]);
+      if (matrix[i][j] < 0) printf("  %8.2f  ",matrix[i][j]);
+      else printf("  %5.3f  ",matrix[i][j]);
       SetColor(0,7);
     }
   }
