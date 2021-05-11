@@ -268,7 +268,7 @@ int main(){
                 printf("=> Nhap ten file: ");
                 fflush(stdin);
                 gets(fileName);
-                outputMatrix(fileName,matrix,numberOfUsers,numberOfItems);
+                outputMatrix(fileName,resultMatrixPearson,numberOfUsers,numberOfItems);
                 fflush(stdin);
                 SetColor(0,2);
                 printf("=> Ghi thanh cong. Nhan phim bat ki de thoat");
