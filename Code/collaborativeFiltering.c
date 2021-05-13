@@ -4,7 +4,7 @@
 #include<math.h>
 void xuat_matran(float matrix[50][50],int numberOfUsers,int numberOfItems,char columnName[10],char rowName[10],int isResult, int indexOfNoneRating[]); // Hàm xuất ma trận
 void inputMatrixFromKeyBoard(float matrix[50][50], int &numberOfUsers, int &numberOfItems);
-void inputMatrix(char fileName[], float matrix[50][50], int &numberOfUsers, int &numberOfItems); // Hàm đọc giá trị ma trận từ file
+int inputMatrix(char fileName[], float matrix[50][50], int &numberOfUsers, int &numberOfItems); // Hàm đọc giá trị ma trận từ file
 void outputMatrix(char fileName[], float matrixOut[50][50], int columns,int rows); // Hàm xuất ma trận ra file
 float getAvgRatingOfUser(float matrix[50][50],int user,int numberOfItems); // Hàm lấy giá trị rating trung bình của người dùng
 float getSimilarityPearson(float matrix[50][50],float avgMatrix[50][50],int user1,int user2,int numberOfItems); // Hàm lấy giá trị sim giữa hai người dùng 
@@ -118,11 +118,22 @@ int main(){
                 printf("=> Nhap ten file: ");
                 fflush(stdin);
                 gets(fileName);
-                inputMatrix(fileName, matrix, numberOfUsers, numberOfItems);
+                if (inputMatrix(fileName, matrix, numberOfUsers, numberOfItems)){
+                  SetColor(0,2);
+                  printf("=> Doc file thanh cong. Nhap phim bat ki de thoat");
+                }else{
+                  do{
+                    SetColor(0,4);
+                    printf("\n=> File khong ton tai. Vui long nhap lai ten file: ");
+                    SetColor(0,11);
+                    fflush(stdin);
+                    gets(fileName);
+                  }while(!inputMatrix(fileName, matrix, numberOfUsers, numberOfItems));
+                  SetColor(0,2);
+                  printf("\n=> Doc file thanh cong. Nhap phim bat ki de thoat");
+                }
                 k = numberOfUsers/2;
                 printf("\n");
-                SetColor(0,2);
-                printf("=> Doc file thanh cong. Nhap phim bat ki de thoat");
                 SetColor(0,11);
                 fflush(stdin);
                 getchar();
@@ -293,23 +304,24 @@ void xuat_matran(float matrix[50][50], int numberOfUsers, int numberOfItems, cha
     SetColor(0,7);
   }
   for (int i = 1;i <= numberOfUsers;i++){
-    printf("\n\t--------+");
-    for (int j = 1;j <= numberOfItems;j++) printf("---------+");
+    printf("\n\t---------");
+    for (int j = 1;j <= numberOfItems;j++) printf("----------");
     printf("\n");
     for (int j = 1;j <= numberOfItems;j++){
       if (j == 1) {
         SetColor(0,2);
         printf("\t%s %d\t",rowName, i);
         SetColor(0,7);
-      }
-      printf("|");
+        printf("|");
+      } 
       if (((i-1)*numberOfItems) + j == indexOfNoneRating[q] && isResult == 1){
         SetColor(0,6);
         q++;
-      } 
-      if (matrix[i][j] < 0) printf("  %8.2f  ",matrix[i][j]);
+      }else if (isResult == 0 && i == j) SetColor(0,6);
+      if (matrix[i][j] < 0) printf("  %5.2f  ",matrix[i][j]);
       else printf("  %5.3f  ",matrix[i][j]);
       SetColor(0,7);
+      printf("|");
     }
   }
 }
@@ -324,14 +336,13 @@ void inputMatrixFromKeyBoard(float matrix[50][50], int &numberOfUsers, int &numb
   }
 } 
 // Hàm đọc giá trị ma trận từ file
-void inputMatrix(char fileName[], float matrix[50][50], int &numberOfUsers, int &numberOfItems){
+int inputMatrix(char fileName[], float matrix[50][50], int &numberOfUsers, int &numberOfItems){
   FILE *fptr;
   fptr = fopen(fileName,"r");
   int rows = 1, columns = 0;
   char c;
   if (fptr == NULL){
-    printf("Can't open file.");
-    exit(1);
+    return 0;
   }else{
     while((c = fgetc(fptr)) != EOF){
       if (c == '\n'){
@@ -347,6 +358,7 @@ void inputMatrix(char fileName[], float matrix[50][50], int &numberOfUsers, int 
   numberOfUsers = rows;
   numberOfItems = columns;
   fclose(fptr);
+  return 1;
 }
 // Ghi kết quả ma trận ra file
 void outputMatrix(char fileName[], float matrix[50][50], int rows, int columns){
