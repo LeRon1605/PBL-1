@@ -279,7 +279,7 @@ int main(){
                 printf("=> Nhap ten file: ");
                 fflush(stdin);
                 gets(fileName);
-                outputMatrix(fileName,resultMatrixPearson,numberOfUsers,numberOfItems);
+                outputMatrix(fileName, resultMatrixPearson, numberOfUsers, numberOfItems);
                 fflush(stdin);
                 SetColor(0,2);
                 printf("=> Ghi thanh cong. Nhan phim bat ki de thoat");
@@ -322,6 +322,10 @@ void xuat_matran(float matrix[50][50], int numberOfUsers, int numberOfItems, cha
       else printf("  %5.3f  ",matrix[i][j]);
       SetColor(0,7);
       printf("|");
+    }
+    if (i == numberOfUsers) {
+      printf("\n\t---------");
+      for (int j = 1;j <= numberOfItems;j++) printf("----------");
     }
   }
 }
